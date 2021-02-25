@@ -1,0 +1,10 @@
+<html>
+  <body>
+    <h1>Repos</h1>
+    <ul>
+      {{ range $r := .Repos }}
+      <li><a href="//github.com/viamrobotics/{{$r}}">{{ $r }}</a></li>
+      {{ end }}
+    </ul>
+  </body>
+</html>
