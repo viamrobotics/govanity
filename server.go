@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	repos = []string{"robotcore", "dynamixel"}
+	repos = []string{"robotcore", "dynamixel", "test"}
 )
 
 type MyApp struct {
