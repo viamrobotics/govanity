@@ -16,3 +16,6 @@
 
 gcp.json
 *~
+etc/dist
+etc/modules.txt
+docs_dist.tgz

@@ -1,9 +1,21 @@
 <html>
   <body>
     <h1>Repos</h1>
-    <ul>
-      {{ range $r := .Repos }}
-      <li><a href="//github.com/viamrobotics/{{$r}}">{{ $r }}</a></li>
+    <table>
+      <tr>
+        <th>Package</th>
+        <th>Links</th>
+      </tr>
+      {{ range $module, $redirectTo := .Modules }}
+        <tr>
+          <td><a href="//{{$redirectTo}}">{{ $module }}</a></td>
+          <td>
+            <a href="//{{$redirectTo}}">src</a>
+            {{ if $.DocsEnabled }}
+              <a href="/pkg/{{$module}}/">docs</a>
+            {{ end }}
+          </td>            
+        </tr>
       {{ end }}
     </ul>
   </body>
