@@ -35,7 +35,6 @@ RUN mkdir -p /home/go/pkg && ln -s /root/go/pkg/mod /home/go/pkg/mod
 COPY --from=builder /etc/new_environment /etc/environment
 COPY --from=builder /app/server /app/server
 COPY --from=builder /app/templates /app/templates
-COPY --from=builder /app/static /app/static
 COPY --from=builder /app/etc/modules.txt /app/etc/modules.txt
 COPY --from=builder /app/doc/mod /app/doc/mod
 
