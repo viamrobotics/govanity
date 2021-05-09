@@ -82,7 +82,6 @@ func NewServer(port int, docOpts DocOptions, useGCPSecrets, debug bool) (*Server
 		pkgName := strings.SplitN(module, "/", 2)[1]
 		theApp.app.Mux.Handle("/"+pkgName, &egoutil.WrappedTemplate{theApp.app, &ModuleRedirect{theApp, module, redirectTo}, false})
 	}
-	theApp.app.Mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static/"))))
 	theApp.app.Mux.Handle("/", &egoutil.WrappedTemplate{theApp.app, &IndexPage{theApp, docOpts.Enabled}, false})
 
 	return &Server{theApp, port, debug}, nil
