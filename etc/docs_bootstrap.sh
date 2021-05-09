@@ -14,9 +14,9 @@ fi
 
 if [[ -z "$SUDO" ]]
 then
-  USE_GCP_SECRETS="" webroot=http://$VANITY_HOST $GO run ../cmd/server/main.go -enable-docs=false -port=80 >/dev/null 2>&1 &
+  webroot=http://$VANITY_HOST $GO run ../cmd/server/main.go -enable-docs=false -port=80 >/dev/null 2>&1 &
 else
-  sudo -E env "PATH=$PATH" USE_GCP_SECRETS="" webroot=http://$VANITY_HOST $GO run ../cmd/server/main.go -enable-docs=false -port=80 >/dev/null 2>&1 &
+  sudo -E env "PATH=$PATH" webroot=http://$VANITY_HOST $GO run ../cmd/server/main.go -enable-docs=false -port=80 >/dev/null 2>&1 &
 fi
 
 list_descendants () {
@@ -60,6 +60,10 @@ fi
 
 echo "creating phony go module"
 cd ../doc/mod
+if [[ ! -z "$DOCKER" ]]
+then
+  $GO clean -modcache
+fi
 rm go.* phony.go >/dev/null 2>&1
 go mod init doc
 echo "$phony" > phony.go

@@ -39,7 +39,7 @@ type Module struct {
 	Vanity     bool
 }
 
-func NewServer(port int, docOpts DocOptions, useGCPSecrets, debug bool) (*Server, error) {
+func NewServer(port int, docOpts DocOptions, secretSource SecretSource, debug bool) (*Server, error) {
 	modules, err := ParseModules()
 	if err != nil {
 		return nil, err
@@ -59,8 +59,8 @@ func NewServer(port int, docOpts DocOptions, useGCPSecrets, debug bool) (*Server
 
 	var exp trace.Exporter
 
-	// TODO(erd): make better way to optionally use this
-	if useGCPSecrets {
+	if secretSource.Type() == SecretSourceTypeGCP {
+		// This only works with GCP right now
 		exp, err = stackdriver.NewExporter(stackdriver.Options{})
 		if err != nil {
 			return nil, err
@@ -72,7 +72,7 @@ func NewServer(port int, docOpts DocOptions, useGCPSecrets, debug bool) (*Server
 	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 
 	theApp := &MyApp{modules: modules}
-	err = theApp.init(useGCPSecrets)
+	err = theApp.init(secretSource)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ type MyApp struct {
 	modules []Module
 }
 
-func (a *MyApp) init(useGCPSecrets bool) error {
+func (a *MyApp) init(secretSource SecretSource) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second) // there are a bunch of requests, so 30 seconds seems fair
 	defer cancel()
 
@@ -137,15 +137,8 @@ func (a *MyApp) init(useGCPSecrets bool) error {
 
 	x.SetTemplateDir(ResolveFile("./templates"))
 
-	// TODO(erd): make better way to optionally use this
-	if useGCPSecrets {
-		secrets, err := egoutil.NewGCPSecrets(ctx)
-		if err != nil {
-			golog.Global.Fatalw("failed to get GCP secrets", "error", err)
-		}
-		if url, err := secrets.GetSecret(ctx, "mongourl"); err == nil && url != "" {
-			x = x.SetMongoURL(url)
-		}
+	if url, err := secretSource.Get(ctx, "mongourl"); err == nil && url != "" {
+		x = x.SetMongoURL(url)
 	}
 
 	var err error

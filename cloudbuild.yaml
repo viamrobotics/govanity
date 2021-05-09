@@ -1,8 +1,8 @@
 steps:
   - name: gcr.io/cloud-builders/docker
     entrypoint: 'bash'
-    args: ['-c', 'echo $$github_repo_read > etc/secrets/github_token.txt; echo $$docs_username > etc/secrets/docs_username.txt; echo $$docs_password > etc/secrets/docs_password.txt']
-    secretEnv: ['github_repo_read', 'docs_username', 'docs_password']
+    args: ['-c', 'echo $$GITHUB_REPO_READ > etc/secrets/github_token.txt']
+    secretEnv: ['GITHUB_REPO_READ']
   - name: gcr.io/cloud-builders/docker
     entrypoint: 'bash'
     args: ['-c', 'echo $_MODULES | tr "," "\n" > etc/modules.txt']
@@ -12,8 +12,6 @@ steps:
       - '--no-cache'
       - '--build-arg'
       - 'VANITY_HOST=$_VANITY_HOST'
-      - '--build-arg'
-      - 'USE_GCP_SECRETS=true'
       - '-t'
       - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
       - .
@@ -42,12 +40,8 @@ steps:
     entrypoint: gcloud
 availableSecrets:
   secretManager:
-  - versionName: 'projects/$PROJECT_ID/secrets/github_repo_read/versions/1'
-    env: 'github_repo_read'
-  - versionName: 'projects/$PROJECT_ID/secrets/docs_username/versions/1'
-    env: 'docs_username'
-  - versionName: 'projects/$PROJECT_ID/secrets/docs_password/versions/1'
-    env: 'docs_password'
+  - versionName: 'projects/$PROJECT_ID/secrets/GITHUB_REPO_READ/versions/2'
+    env: 'GITHUB_REPO_READ'
 images:
   - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
 options:

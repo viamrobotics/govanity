@@ -194,8 +194,8 @@ github.com/envoyproxy/go-control-plane v0.9.9-0.20210217033140-668b12f5399d/go.m
 github.com/envoyproxy/protoc-gen-validate v0.0.14/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/envoyproxy/protoc-gen-validate v0.1.0 h1:EQciDnbrYxy13PgWoY8AqoxGiPrpgBZ1R8UNe3ddc+A=
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
-github.com/erh/egoutil v0.0.12-0.20210505202010-e5a0fa8e3e15 h1:knXTxtDwAXY8zhse+kUS+SHekToQhFwPmqE4uWphgIo=
-github.com/erh/egoutil v0.0.12-0.20210505202010-e5a0fa8e3e15/go.mod h1:1VyxOkpz+Pch5ogfwg0SCbLx4ehqipQkGYrpLTWwCJE=
+github.com/erh/egoutil v0.0.12-0.20210509202132-7e7f6d72af1f h1:NNsrD6uqWSrYixtEp7cYaXGL9UbOWzYmKmJG9iskFPQ=
+github.com/erh/egoutil v0.0.12-0.20210509202132-7e7f6d72af1f/go.mod h1:1VyxOkpz+Pch5ogfwg0SCbLx4ehqipQkGYrpLTWwCJE=
 github.com/esimonov/ifshort v1.0.2 h1:K5s1W2fGfkoWXsFlxBNqT6J0ZCncPaKrGM5qe0bni68=
 github.com/esimonov/ifshort v1.0.2/go.mod h1:yZqNJUrNn20K8Q9n2CrjTKYyVEmX209Hgu+M1LBpeZE=
 github.com/fatih/addlint v0.0.0-20190906181921-76b21bd409a2/go.mod h1:jDmgAsni5lF2hjg3Eozc5y+Uh9hE26oBfZ1fCLSet0U=
