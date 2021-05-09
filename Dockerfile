@@ -40,5 +40,4 @@ COPY --from=builder /app/doc/mod /app/doc/mod
 
 ENV GOMODPATH=/app/doc/mod
 ENV PATH=/usr/local/go/bin:$PATH
-ENV USE_GCP_SECRETS=${USE_GCP_SECRETS}
 ENTRYPOINT /bin/sh -c "source /etc/environment && /app/server"
