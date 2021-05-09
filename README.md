@@ -8,13 +8,15 @@ Specify repos in `etc/modules.txt`, e.g.:
 
 ```
 vanity.domain.com/private-repo=github.com/org/private-repo
-github.com/org/no-vanity-private-pro
+github.com/org/no-vanity-private-repro
 ```
 
 ## Static Doc Generation
 
 Without vanity:
+
 Run `make docs_static`.
 
 With vanity:
+
 Run `VANITY_HOST=<vanity_domain> make docs_static`.
