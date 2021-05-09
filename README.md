@@ -4,7 +4,7 @@ For nice vanity urls for go and private documentation.
 
 ## Setup
 
-Specify repos in `etc/repos.txt`, e.g.:
+Specify repos in `etc/modules.txt`, e.g.:
 
 ```
 vanity.domain.com/private-repo=github.com/org/private-repo
