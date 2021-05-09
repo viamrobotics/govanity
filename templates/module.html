@@ -1,10 +1,28 @@
-<html>
-    <head>
-        <meta name="go-import" content="{{.Module}} git https://{{.RedirectTo}}">
-        <meta name="go-source" content="{{.Module}} https://{{.RedirectTo}} https://{{.RedirectTo}}/tree/master{/dir} https://{{.RedirectTo}}/tree/master{/dir}/{file}#L{line}">
-        <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/{{.Module}}">
-    </head>
-    <body>
-        Nothing to see here. Please <a href="https://pkg.go.dev/{{.Module}}">move along</a>.
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <title>{{.Module.Name}}</title>
+      <style>
+        #footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: gray;
+            color: white;
+            text-align: center;
+        }
+      </style>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="go-import" content="{{.Module.Name}} git https://{{.Module.RedirectTo}}">
+      <meta name="go-source" content="{{.Module.Name}} https://{{.Module.RedirectTo}} https://{{.Module.RedirectTo}}/tree/master{/dir} https://{{.Module.RedirectTo}}/tree/master{/dir}/{file}#L{line}">
+      <meta http-equiv="refresh" content="0; url=https://pkg.go.dev/{{.Module.Name}}">
+  </head>
+  <body>
+    <p>Nothing to see here. Please <a href="https://pkg.go.dev/{{.Module.Name}}">move along</a>.</p>
+    <div id="footer">
+      powered by <a href="https://github.com/viamrobotics/govanity">govanity</a>
+    </div>
+  </body>
 </html>

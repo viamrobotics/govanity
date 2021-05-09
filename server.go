@@ -32,11 +32,31 @@ type DocOptions struct {
 	Password string
 }
 
+type Module struct {
+	Name       string
+	RedirectTo string
+	Private    bool
+	Vanity     bool
+}
+
 func NewServer(port int, docOpts DocOptions, useGCPSecrets, debug bool) (*Server, error) {
 	modules, err := ParseModules()
 	if err != nil {
 		return nil, err
 	}
+
+	for idx, module := range modules {
+		resp, err := http.Get(fmt.Sprintf("https://%s", module.RedirectTo))
+		if err != nil {
+			golog.Global.Debugw("error doing HTTP GET for module %q", module.RedirectTo, "error", err)
+			continue
+		}
+		if resp.StatusCode != http.StatusOK {
+			module.Private = true
+			modules[idx] = module
+		}
+	}
+
 	var exp trace.Exporter
 
 	// TODO(erd): make better way to optionally use this
@@ -74,13 +94,12 @@ func NewServer(port int, docOpts DocOptions, useGCPSecrets, debug bool) (*Server
 		}
 	}
 
-	for module, redirectTo := range modules {
-		if module == redirectTo {
-			// no vanity
+	for _, module := range modules {
+		if !module.Vanity {
 			continue
 		}
-		pkgName := strings.SplitN(module, "/", 2)[1]
-		theApp.app.Mux.Handle("/"+pkgName, &egoutil.WrappedTemplate{theApp.app, &ModuleRedirect{theApp, module, redirectTo}, false})
+		pkgName := strings.SplitN(module.Name, "/", 2)[1]
+		theApp.app.Mux.Handle("/"+pkgName, &egoutil.WrappedTemplate{theApp.app, &ModuleRedirect{theApp, module}, false})
 	}
 	theApp.app.Mux.Handle("/", &egoutil.WrappedTemplate{theApp.app, &IndexPage{theApp, docOpts.Enabled}, false})
 
@@ -103,7 +122,7 @@ func (srv *Server) Run() error {
 
 type MyApp struct {
 	app     *egoutil.SimpleWebApp
-	modules map[string]string
+	modules []Module
 }
 
 func (a *MyApp) init(useGCPSecrets bool) error {
@@ -184,7 +203,7 @@ type IndexPage struct {
 
 func (p *IndexPage) Serve(ctx context.Context, user egoutil.UserInfo, r *http.Request) (string, interface{}, error) {
 	type Temp struct {
-		Modules     map[string]string
+		Modules     []Module
 		DocsEnabled bool
 	}
 	temp := Temp{p.a.modules, p.docsEnabled}
@@ -195,17 +214,15 @@ func (p *IndexPage) Serve(ctx context.Context, user egoutil.UserInfo, r *http.Re
 // ---
 
 type ModuleRedirect struct {
-	a          *MyApp
-	module     string
-	redirectTo string
+	a      *MyApp
+	module Module
 }
 
 func (p *ModuleRedirect) Serve(ctx context.Context, user egoutil.UserInfo, r *http.Request) (string, interface{}, error) {
 	type Temp struct {
-		Module     string
-		RedirectTo string
+		Module Module
 	}
-	temp := Temp{p.module, p.redirectTo}
+	temp := Temp{p.module}
 
 	return "module.html", temp, nil
 }

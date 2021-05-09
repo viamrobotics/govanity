@@ -14,7 +14,7 @@ func Phony() {
 		golog.Global.Fatal(err)
 	}
 	fmt.Println("package doc")
-	for k := range modules {
-		fmt.Printf("import _ \"%s\"\n", k)
+	for _, module := range modules {
+		fmt.Printf("import _ \"%s\"\n", module.Name)
 	}
 }

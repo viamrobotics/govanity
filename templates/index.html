@@ -1,35 +1,45 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <style>
-      #footer {
-          position: fixed;
-          left: 0;
-          bottom: 0;
-          width: 100%;
-          background-color: gray;
-          color: white;
-          text-align: center;
-      }
-    </style>
+      <style>
+        #footer {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: gray;
+            color: white;
+            text-align: center;
+        }
+      </style>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Repos</title>
   </head>
   <body>
     <h1>Repos</h1>
     <table>
-      <tr>
-        <th>Package</th>
-        <th>Links</th>
-      </tr>
-      {{ range $module, $redirectTo := .Modules }}
         <tr>
-          <td><a href="//{{$redirectTo}}">{{ $module }}</a></td>
-          <td>
-            <a href="//{{$redirectTo}}">src</a>
-            {{ if $.DocsEnabled }}
-              <a href="/pkg/{{$module}}/">docs</a>
-            {{ end }}
-          </td>            
+          <th>Package</th>
+          <th>Links</th>
         </tr>
-      {{ end }}
+        {{ range $module := .Modules }}
+          <tr>
+            <td>
+              <a href="//{{$module.RedirectTo}}">{{ $module.Name }}</a>
+            </td>
+            <td>
+              <a href="//{{$module.RedirectTo}}">src</a>
+              {{ if $module.Private }}
+                {{ if $.DocsEnabled }}
+                  <a href="/pkg/{{$module.Name}}/">docs</a>
+                {{ end }}
+              {{ else }}
+                <a href="https://pkg.go.dev/pkg/{{$module.Name}}/">docs</a>
+              {{ end }}
+            </td>            
+          </tr>
+        {{ end }}
     </table>
     <div id="footer">
       powered by <a href="https://github.com/viamrobotics/govanity">govanity</a>

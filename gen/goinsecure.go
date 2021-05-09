@@ -13,11 +13,10 @@ func GoInsecure() {
 	if err != nil {
 		golog.Global.Fatal(err)
 	}
-	for k, v := range modules {
-		if k == v {
-			// no vanity
+	for _, module := range modules {
+		if !module.Vanity {
 			continue
 		}
-		fmt.Printf("%s,", k)
+		fmt.Printf("%s,", module.Name)
 	}
 }

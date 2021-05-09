@@ -17,21 +17,24 @@ func ResolveFile(fn string) string {
 	return filepath.Join(thisDirPath, fn)
 }
 
-func ParseModules() (map[string]string, error) {
+func ParseModules() ([]Module, error) {
 	moduleFiles, err := os.Open(ResolveFile("./etc/modules.txt"))
 	if err != nil {
 		return nil, err
 	}
-	modules := map[string]string{}
+	var modules []Module
 	scanner := bufio.NewScanner(moduleFiles)
 	for scanner.Scan() {
 		parts := strings.SplitN(scanner.Text(), "=", 2)
+		var module Module
+		module.Name = parts[0]
 		if len(parts) == 1 {
-			// no vanity
-			modules[parts[0]] = parts[0]
-			continue
+			module.RedirectTo = parts[0]
+		} else {
+			module.RedirectTo = parts[1]
+			module.Vanity = true
 		}
-		modules[parts[0]] = parts[1]
+		modules = append(modules, module)
 	}
 	moduleFiles.Close()
 	if err := scanner.Err(); err != nil {

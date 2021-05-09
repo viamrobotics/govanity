@@ -14,11 +14,10 @@ func Hosts() {
 	if err != nil {
 		golog.Global.Fatal(err)
 	}
-	for k, v := range modules {
-		if k == v {
-			// no vanity
+	for _, module := range modules {
+		if !module.Vanity {
 			continue
 		}
-		fmt.Printf("127.0.0.1 %s\n", strings.Split(k, "/")[0])
+		fmt.Printf("127.0.0.1 %s\n", strings.Split(module.Name, "/")[0])
 	}
 }
