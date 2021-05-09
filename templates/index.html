@@ -1,4 +1,17 @@
 <html>
+  <head>
+    <style>
+      #footer {
+          position: fixed;
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          background-color: gray;
+          color: white;
+          text-align: center;
+      }
+    </style>
+  </head>
   <body>
     <h1>Repos</h1>
     <table>
@@ -17,6 +30,9 @@
           </td>            
         </tr>
       {{ end }}
-    </ul>
+    </table>
+    <div id="footer">
+      powered by <a href="https://github.com/viamrobotics/govanity">govanity</a>
+    </div>
   </body>
 </html>

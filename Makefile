@@ -36,7 +36,7 @@ docs_static: docs_bootstrap
 	./etc/docs_static.sh ${DOCS_DIST}
 
 runlocal:
-	go run server.go --debug
+	go run cmd/server/main.go --debug
 
 mongo:
 	mongo `gcloud --project $(GCP_PROJECT) secrets versions access latest --secret=mongourl`
