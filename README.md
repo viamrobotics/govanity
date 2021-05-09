@@ -2,6 +2,8 @@
 
 For nice vanity urls for go and private documentation.
 
+Example @ http://go.viam.com/
+
 ## Setup
 
 Specify repos in `etc/modules.txt`, e.g.:
