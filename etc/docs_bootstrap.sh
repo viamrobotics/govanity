@@ -67,7 +67,7 @@ echo "$phony" > phony.go
 echo "downloading dependencies"
 while read repoMapping; do
 	repo=($(echo $repoMapping | awk -F= '{print $1}'))
-	go get ${repo}@master
+	go get ${repo}@HEAD
 done < $THIS_DIR/modules.txt
 go mod tidy
 go mod download `go list -f '{{if not .Indirect}}{{.}}{{end}}' -m all | sed 1d | tr ' ' '@' | tr '\n' ' '`

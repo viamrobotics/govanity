@@ -2,6 +2,7 @@ package gen
 
 import (
 	"fmt"
+	"strings"
 
 	"go.viam.com/govanity"
 
@@ -13,10 +14,16 @@ func GoInsecure() {
 	if err != nil {
 		golog.Global.Fatal(err)
 	}
+	seen := map[string]struct{}{}
 	for _, module := range modules {
 		if !module.Vanity {
 			continue
 		}
-		fmt.Printf("%s,", module.Name)
+		vanity := strings.Split(module.Name, "/")[0]
+		if _, ok := seen[vanity]; ok {
+			continue
+		}
+		seen[vanity] = struct{}{}
+		fmt.Printf("%s/*,", vanity)
 	}
 }

@@ -14,10 +14,16 @@ func Hosts() {
 	if err != nil {
 		golog.Global.Fatal(err)
 	}
+	seen := map[string]struct{}{}
 	for _, module := range modules {
 		if !module.Vanity {
 			continue
 		}
-		fmt.Printf("127.0.0.1 %s\n", strings.Split(module.Name, "/")[0])
+		vanity := strings.Split(module.Name, "/")[0]
+		if _, ok := seen[vanity]; ok {
+			continue
+		}
+		seen[vanity] = struct{}{}
+		fmt.Printf("127.0.0.1 %s\n", vanity)
 	}
 }
