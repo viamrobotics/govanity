@@ -12,11 +12,12 @@ then
   fi
 fi
 
+VANITY_HOST=`$GO run ../gen/cmd/gen/main.go vanity_host`
 if [[ -z "$SUDO" ]]
 then
-  webroot=http://$VANITY_HOST $GO run ../cmd/server/main.go -enable-docs=false -port=80 >/dev/null 2>&1 &
+  webroot=http://$VANITY_HOST $GO run ../cmd/server/main.go -port=80 &
 else
-  sudo -E env "PATH=$PATH" webroot=http://$VANITY_HOST $GO run ../cmd/server/main.go -enable-docs=false -port=80 >/dev/null 2>&1 &
+  sudo -E env "PATH=$PATH" webroot=http://$VANITY_HOST $GO run ../cmd/server/main.go -port=80 &
 fi
 
 list_descendants () {
@@ -69,9 +70,12 @@ go mod init doc
 echo "$phony" > phony.go
 
 echo "downloading dependencies"
-while read repoMapping; do
-	repo=($(echo $repoMapping | awk -F= '{print $1}'))
-	go get ${repo}@HEAD
-done < $THIS_DIR/modules.txt
+while IFS=';' read -ra MODS; do
+  for i in "${MODS[@]}"; do
+    repo=($(echo $i | awk -F= '{print $1}'))
+    go get ${repo}@HEAD
+  done
+done <<< "$GO_MODULES"
+
 go mod tidy
 go mod download `go list -f '{{if not .Indirect}}{{.}}{{end}}' -m all | sed 1d | tr ' ' '@' | tr '\n' ' '`

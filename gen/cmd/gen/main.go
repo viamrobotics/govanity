@@ -18,6 +18,8 @@ func main() {
 		gen.GoInsecure()
 	case "hosts":
 		gen.Hosts()
+	case "vanity_host":
+		gen.VanityHost()
 	case "phony":
 		gen.Phony()
 	default:

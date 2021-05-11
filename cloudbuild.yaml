@@ -4,14 +4,11 @@ steps:
     args: ['-c', 'echo $$GITHUB_REPO_READ > etc/secrets/github_token.txt']
     secretEnv: ['GITHUB_REPO_READ']
   - name: gcr.io/cloud-builders/docker
-    entrypoint: 'bash'
-    args: ['-c', 'echo $_MODULES | tr "," "\n" > etc/modules.txt']
-  - name: gcr.io/cloud-builders/docker
     args:
       - build
       - '--no-cache'
       - '--build-arg'
-      - 'VANITY_HOST=$_VANITY_HOST'
+      - 'GO_MODULES=$_MODULES'
       - '-t'
       - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
       - .

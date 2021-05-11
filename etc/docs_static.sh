@@ -4,7 +4,7 @@ OUT_FILE="$1"
 THIS_DIR="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 cd $THIS_DIR
 
-$GO run ../cmd/server/main.go --static-docs >/dev/null 2>&1 &
+$GO run ../cmd/server/main.go --enable-docs --static-docs ../doc/mod >/dev/null 2>&1 &
 
 list_descendants () {
   local children=$(ps -o pid= --ppid "$1")

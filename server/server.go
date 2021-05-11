@@ -1,4 +1,4 @@
-package govanity
+package server
 
 import (
 	"context"
@@ -11,12 +11,12 @@ import (
 	"time"
 
 	"contrib.go.opencensus.io/exporter/stackdriver"
-	"go.opencensus.io/trace"
-
-	"go.viam.com/govanity/doc"
-
 	"github.com/edaniels/golog"
 	"github.com/erh/egoutil"
+	"go.opencensus.io/trace"
+
+	"go.viam.com/govanity"
+	"go.viam.com/govanity/doc"
 )
 
 type Server struct {
@@ -26,29 +26,22 @@ type Server struct {
 }
 
 type DocOptions struct {
-	Enabled  bool
-	Static   bool
-	Username string
-	Password string
+	Enabled     bool
+	Static      bool
+	ModFilePath string
+	Username    string
+	Password    string
 }
 
-type Module struct {
-	Name       string
-	RedirectTo string
-	Private    bool
-	Vanity     bool
-}
-
-func NewServer(port int, docOpts DocOptions, secretSource SecretSource, debug bool) (*Server, error) {
-	modules, err := ParseModules()
+func NewServer(port int, docOpts DocOptions, secretSource govanity.SecretSource, debug bool) (*Server, error) {
+	modules, _, err := govanity.ParseModules()
 	if err != nil {
 		return nil, err
 	}
-
 	for idx, module := range modules {
 		resp, err := http.Get(fmt.Sprintf("https://%s", module.RedirectTo))
 		if err != nil {
-			golog.Global.Debugw("error doing HTTP GET for module %q", module.RedirectTo, "error", err)
+			golog.Global.Debugw("error doing HTTP GET", "module", module.RedirectTo, "error", err)
 			continue
 		}
 		if resp.StatusCode != http.StatusOK {
@@ -59,8 +52,9 @@ func NewServer(port int, docOpts DocOptions, secretSource SecretSource, debug bo
 
 	var exp trace.Exporter
 
-	if secretSource.Type() == SecretSourceTypeGCP {
+	if secretSource.Type() == govanity.SecretSourceTypeGCP {
 		// This only works with GCP right now
+		var err error
 		exp, err = stackdriver.NewExporter(stackdriver.Options{})
 		if err != nil {
 			return nil, err
@@ -72,25 +66,13 @@ func NewServer(port int, docOpts DocOptions, secretSource SecretSource, debug bo
 	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 
 	theApp := &MyApp{modules: modules}
-	err = theApp.init(secretSource)
-	if err != nil {
+	if err := theApp.init(secretSource); err != nil {
 		return nil, err
 	}
 
-	goModPath := ResolveFile("doc/mod/go.mod")
-	if _, err := os.Stat(goModPath); os.IsNotExist(err) {
-		goModPath = ""
-	} else {
-		goModPath = filepath.Dir(goModPath)
-	}
 	if docOpts.Enabled {
-		if goModPath == "" {
-			docOpts.Enabled = false
-			golog.Global.Info("No go mod found; skipping serving documentation")
-		} else {
-			if err := theApp.registerDocs(goModPath, docOpts); err != nil {
-				return nil, err
-			}
+		if err := theApp.registerDocs(docOpts); err != nil {
+			return nil, err
 		}
 	}
 
@@ -122,10 +104,10 @@ func (srv *Server) Run() error {
 
 type MyApp struct {
 	app     *egoutil.SimpleWebApp
-	modules []Module
+	modules []govanity.Module
 }
 
-func (a *MyApp) init(secretSource SecretSource) error {
+func (a *MyApp) init(secretSource govanity.SecretSource) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second) // there are a bunch of requests, so 30 seconds seems fair
 	defer cancel()
 
@@ -135,7 +117,7 @@ func (a *MyApp) init(secretSource SecretSource) error {
 		x = x.SetWebRoot(os.Getenv("webroot"))
 	}
 
-	x.SetTemplateDir(ResolveFile("./templates"))
+	x.SetTemplateDir(govanity.ResolveFile("templates"))
 
 	if url, err := secretSource.Get(ctx, "mongourl"); err == nil && url != "" {
 		x = x.SetMongoURL(url)
@@ -150,8 +132,8 @@ func (a *MyApp) init(secretSource SecretSource) error {
 	return nil
 }
 
-func (a *MyApp) registerDocs(goModPath string, opts DocOptions) error {
-	absPath, err := filepath.Abs(goModPath)
+func (a *MyApp) registerDocs(opts DocOptions) error {
+	absPath, err := filepath.Abs(opts.ModFilePath)
 	if err != nil {
 		return err
 	}
@@ -196,7 +178,7 @@ type IndexPage struct {
 
 func (p *IndexPage) Serve(ctx context.Context, user egoutil.UserInfo, r *http.Request) (string, interface{}, error) {
 	type Temp struct {
-		Modules     []Module
+		Modules     []govanity.Module
 		DocsEnabled bool
 	}
 	temp := Temp{p.a.modules, p.docsEnabled}
@@ -208,12 +190,12 @@ func (p *IndexPage) Serve(ctx context.Context, user egoutil.UserInfo, r *http.Re
 
 type ModuleRedirect struct {
 	a      *MyApp
-	module Module
+	module govanity.Module
 }
 
 func (p *ModuleRedirect) Serve(ctx context.Context, user egoutil.UserInfo, r *http.Request) (string, interface{}, error) {
 	type Temp struct {
-		Module Module
+		Module govanity.Module
 	}
 	temp := Temp{p.module}
 

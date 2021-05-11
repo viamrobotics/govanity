@@ -3,20 +3,32 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"os"
 
 	"go.viam.com/govanity"
+	"go.viam.com/govanity/server"
 
 	"github.com/edaniels/golog"
 )
 
 func main() {
 	debug := flag.Bool("debug", false, "debug mode")
-	enableDocs := flag.Bool("enable-docs", true, "enable docs")
+	enableDocs := flag.Bool("enable-docs", false, "enable docs")
 	staticDocs := flag.Bool("static-docs", false, "enable docs")
 	port := flag.Int("port", 8080, "http port")
 
 	flag.Parse()
+
+	var goModFilePath string
+	if *enableDocs {
+		if flag.NArg() != 1 {
+			fmt.Fprintln(os.Stderr, "govanity <go mod file>")
+			flag.Usage()
+			os.Exit(1)
+		}
+		goModFilePath = flag.Arg(0)
+	}
 
 	secretSource, err := govanity.NewSecretSource(
 		context.Background(),
@@ -33,14 +45,15 @@ func main() {
 	if err != nil && err != govanity.ErrSecretNotFound {
 		golog.Global.Fatal(err)
 	}
-	docOptions := govanity.DocOptions{
-		Enabled:  *enableDocs,
-		Static:   *staticDocs,
-		Username: docsUsername,
-		Password: docsPassword,
+	docOptions := server.DocOptions{
+		Enabled:     *enableDocs,
+		Static:      *staticDocs,
+		ModFilePath: goModFilePath,
+		Username:    docsUsername,
+		Password:    docsPassword,
 	}
 
-	server, err := govanity.NewServer(*port, docOptions, secretSource, *debug)
+	server, err := server.NewServer(*port, docOptions, secretSource, *debug)
 	if err != nil {
 		golog.Global.Fatal(err)
 	}

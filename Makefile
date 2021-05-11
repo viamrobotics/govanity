@@ -10,15 +10,6 @@ ifeq ($(DOCS_DIST),)
 DOCS_DIST := $(shell pwd)/docs_dist.tgz
 endif
 
-ifeq ($(VANITY_HOST),)
-export VANITY_HOST = "domain.com"
-export VANITY_HOST_NOT_SET = "true"
-$(warning VANITY_HOST not set, using ${VANITY_HOST})
-endif
-
-need_vanity:
-	./etc/need_vanity.sh
-
 goformat:
 	go install golang.org/x/tools/cmd/goimports
 	gofmt -s -w .
@@ -29,8 +20,8 @@ lint: goformat
 	go list -f '{{.Dir}}' ./... | grep -v gen | xargs go vet -vettool=`go env GOPATH`/bin/combined
 	go list -f '{{.Dir}}' ./... | grep -v gen | xargs go run github.com/golangci/golangci-lint/cmd/golangci-lint run -v
 
-docs_bootstrap: need_vanity
-	./etc/docs_bootstrap.sh ${VANITY_HOST}
+docs_bootstrap:
+	./etc/docs_bootstrap.sh
 
 docs_static: docs_bootstrap
 	./etc/docs_static.sh ${DOCS_DIST}
@@ -44,8 +35,8 @@ mongo:
 mongo_setup:
 	mongo `gcloud --project $(GCP_PROJECT) secrets versions access latest --secret=mongourl` mongosetup.js
 
-build_docker: need_vanity
-	docker build --build-arg VANITY_HOST=$(VANITY_HOST) -t $(APP_ID) .
+build_docker:
+	docker build --build-arg GO_MODULES=${GO_MODULES} -t $(APP_ID) .
 
 run_docker: build_docker 
 	docker run -p 8080:8080 -e GOOGLE_APPLICATION_CREDENTIALS=/tmp/keys/FILE_NAME.json -v ${GOOGLE_APPLICATION_CREDENTIALS}:/tmp/keys/FILE_NAME.json:ro $(APP_ID)

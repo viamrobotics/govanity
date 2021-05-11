@@ -3,18 +3,18 @@ package gen
 import (
 	"fmt"
 
-	"go.viam.com/govanity"
-
 	"github.com/edaniels/golog"
+
+	"go.viam.com/govanity"
 )
 
 func Phony() {
-	modules, err := govanity.ParseModules()
+	mods, _, err := govanity.ParseModules()
 	if err != nil {
 		golog.Global.Fatal(err)
 	}
 	fmt.Println("package doc")
-	for _, module := range modules {
+	for _, module := range mods {
 		fmt.Printf("import _ \"%s\"\n", module.Name)
 	}
 }

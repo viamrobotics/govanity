@@ -8,10 +8,10 @@ import (
 	"go.viam.com/govanity"
 )
 
-func GoInsecure() {
+func VanityHost() {
 	_, vanity, err := govanity.ParseModules()
 	if err != nil {
 		golog.Global.Fatal(err)
 	}
-	fmt.Printf("%s/*,", vanity)
+	fmt.Print(vanity)
 }
