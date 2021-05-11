@@ -20,13 +20,23 @@ else
   sudo -E env "PATH=$PATH" webroot=http://$VANITY_HOST $GO run ../cmd/server/main.go -port=80 &
 fi
 
-list_descendants () {
-  local children=$(ps -o pid= --ppid "$1")
-  for pid in $children
-  do
-    list_descendants "$pid"
-  done
-  echo "$children"
+# https://stackoverflow.com/a/26966800
+kill_descendant_processes() {
+    local pid="$1"
+    local and_self="${2:-false}"
+    if children="$(pgrep -P "$pid")"; then
+        for child in $children; do
+            kill_descendant_processes "$child" true
+        done
+    fi
+    if [[ "$and_self" == true ]]; then
+        if [[ -z "$SUDO" ]]
+        then
+          kill -9 "$pid"
+        else
+          sudo kill -9 "$pid"
+        fi
+    fi
 }
 
 if [[ -z "$SUDO" ]]
@@ -38,9 +48,9 @@ fi
 
 if [[ -z "$SUDO" ]]
 then
-  trap 'mv /etc/hosts.bak /etc/hosts; kill $(list_descendants $$) >/dev/null 2>&1' EXIT
+  trap 'mv /etc/hosts.bak /etc/hosts; kill_descendant_processes $$ >/dev/null 2>&1' EXIT
 else
-  trap 'sudo mv /etc/hosts.bak /etc/hosts; sudo kill $(list_descendants $$) >/dev/null 2>&1' EXIT
+  trap 'sudo mv /etc/hosts.bak /etc/hosts; kill_descendant_processes $$ >/dev/null 2>&1' EXIT
 fi
 until $(curl --output /dev/null --silent --head --fail http://localhost); do
     echo "waiting for webserver"

@@ -6,16 +6,21 @@ cd $THIS_DIR
 
 $GO run ../cmd/server/main.go --enable-docs --static-docs ../doc/mod >/dev/null 2>&1 &
 
-list_descendants () {
-  local children=$(ps -o pid= --ppid "$1")
-  for pid in $children
-  do
-    list_descendants "$pid"
-  done
-  echo "$children"
+# https://stackoverflow.com/a/26966800
+kill_descendant_processes() {
+    local pid="$1"
+    local and_self="${2:-false}"
+    if children="$(pgrep -P "$pid")"; then
+        for child in $children; do
+            kill_descendant_processes "$child" true
+        done
+    fi
+    if [[ "$and_self" == true ]]; then
+        kill -9 "$pid"
+    fi
 }
 
-trap 'kill $(list_descendants $$) >/dev/null 2>&1' EXIT
+trap 'kill_descendant_processes $$ >/dev/null 2>&1' EXIT
 
 until $(curl --output /dev/null --silent --head --fail http://localhost:8080); do
     echo "waiting for webserver"
