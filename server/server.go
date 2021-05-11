@@ -66,7 +66,7 @@ func NewServer(port int, docOpts DocOptions, secretSource govanity.SecretSource,
 	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 
 	theApp := &MyApp{modules: modules}
-	if err := theApp.init(secretSource); err != nil {
+	if err := theApp.init(secretSource, debug); err != nil {
 		return nil, err
 	}
 
@@ -89,10 +89,6 @@ func NewServer(port int, docOpts DocOptions, secretSource govanity.SecretSource,
 }
 
 func (srv *Server) Run() error {
-	if srv.debug {
-		go srv.app.app.ReloadTemplateThread()
-	}
-
 	golog.Global.Debugf("starting to listen")
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", srv.port), srv.app.app.Mux); err != http.ErrServerClosed && err != nil {
@@ -107,17 +103,21 @@ type MyApp struct {
 	modules []govanity.Module
 }
 
-func (a *MyApp) init(secretSource govanity.SecretSource) error {
+func (a *MyApp) init(secretSource govanity.SecretSource, debug bool) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second) // there are a bunch of requests, so 30 seconds seems fair
 	defer cancel()
 
-	x := egoutil.NewSimpleWebAppConfig()
+	var x *egoutil.SimpleWebAppConfig
+	if debug {
+		x = egoutil.NewSimpleWebAppConfig(govanity.ResolveFile("templates"))
+	} else {
+		x = egoutil.NewSimpleWebAppConfig("templates")
+		x = x.SetTemplateEmbed(&govanity.EmbeddedTemplates)
+	}
 
 	if os.Getenv("webroot") != "" {
 		x = x.SetWebRoot(os.Getenv("webroot"))
 	}
-
-	x.SetTemplateDir(govanity.ResolveFile("templates"))
 
 	if url, err := secretSource.Get(ctx, "mongourl"); err == nil && url != "" {
 		x = x.SetMongoURL(url)

@@ -30,7 +30,6 @@ COPY --from=builder /go/pkg/mod /root/go/pkg/mod
 RUN mkdir -p /home/go/pkg && ln -s /root/go/pkg/mod /home/go/pkg/mod
 
 COPY --from=builder /app/server_cmd /app/server_cmd
-COPY --from=builder /app/templates /app/templates
 COPY --from=builder /app/doc/mod /app/doc/mod
 
 ENV GO_MODULES=$GO_MODULES

@@ -7,7 +7,7 @@ require (
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/edaniels/golinters v0.0.4
 	github.com/edaniels/golog v0.0.0-20210104162753-3254576d0129
-	github.com/erh/egoutil v0.0.12-0.20210509202132-7e7f6d72af1f
+	github.com/erh/egoutil v0.0.12
 	github.com/fullstorydev/grpcurl v1.8.1
 	github.com/golangci/golangci-lint v1.39.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.4.0
