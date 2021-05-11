@@ -37,11 +37,11 @@ func main() {
 		golog.Global.Fatal(err)
 	}
 
-	docsUsername, err := secretSource.Get(context.Background(), "docs_username")
+	docsUsername, err := secretSource.Get(context.Background(), "DOCS_USERNAME")
 	if err != nil && err != govanity.ErrSecretNotFound {
 		golog.Global.Fatal(err)
 	}
-	docsPassword, err := secretSource.Get(context.Background(), "docs_password")
+	docsPassword, err := secretSource.Get(context.Background(), "DOCS_PASSWORD")
 	if err != nil && err != govanity.ErrSecretNotFound {
 		golog.Global.Fatal(err)
 	}
