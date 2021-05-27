@@ -10,10 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"contrib.go.opencensus.io/exporter/stackdriver"
 	"github.com/edaniels/golog"
 	"github.com/erh/egoutil"
-	"go.opencensus.io/trace"
 
 	"go.viam.com/govanity"
 	"go.viam.com/govanity/doc"
@@ -49,21 +47,6 @@ func NewServer(port int, docOpts DocOptions, secretSource govanity.SecretSource,
 			modules[idx] = module
 		}
 	}
-
-	var exp trace.Exporter
-
-	if secretSource.Type() == govanity.SecretSourceTypeGCP {
-		// This only works with GCP right now
-		var err error
-		exp, err = stackdriver.NewExporter(stackdriver.Options{})
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		exp = egoutil.NewNiceLoggingSpanExporter()
-	}
-	trace.RegisterExporter(exp)
-	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 
 	theApp := &MyApp{modules: modules}
 	if err := theApp.init(secretSource, debug); err != nil {
