@@ -1,6 +1,6 @@
 # govanity
 
-For nice vanity urls for go and private documentation.
+For nice vanity urls for golang and private documentation.
 
 Example @ http://go.viam.com/
 
