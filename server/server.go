@@ -12,6 +12,7 @@ import (
 
 	"github.com/edaniels/golog"
 	"github.com/erh/egoutil"
+	"go.viam.com/utils/secrets"
 
 	"go.viam.com/govanity"
 	"go.viam.com/govanity/doc"
@@ -31,7 +32,7 @@ type DocOptions struct {
 	Password    string
 }
 
-func NewServer(port int, docOpts DocOptions, secretSource govanity.SecretSource, debug bool) (*Server, error) {
+func NewServer(port int, docOpts DocOptions, secretSource secrets.SecretSource, debug bool) (*Server, error) {
 	modules, _, err := govanity.ParseModules()
 	if err != nil {
 		return nil, err
@@ -86,7 +87,7 @@ type MyApp struct {
 	modules []govanity.Module
 }
 
-func (a *MyApp) init(secretSource govanity.SecretSource, debug bool) error {
+func (a *MyApp) init(secretSource secrets.SecretSource, debug bool) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second) // there are a bunch of requests, so 30 seconds seems fair
 	defer cancel()
 

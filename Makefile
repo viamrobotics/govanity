@@ -29,6 +29,9 @@ docs_static: docs_bootstrap
 runlocal:
 	go run cmd/server/main.go --debug
 
+runlocaldummy:
+	GO_MODULES=vanity.domain.com/private-repo=github.com/org/private-repo,github.com/org/no-vanity-private-repro go run cmd/server/main.go --debug
+
 mongo:
 	mongo `gcloud --project $(GCP_PROJECT) secrets versions access latest --secret=mongourl`
 
