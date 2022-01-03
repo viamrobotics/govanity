@@ -34,4 +34,5 @@ COPY --from=builder /app/doc/mod /app/doc/mod
 
 ENV GO_MODULES=$GO_MODULES
 ENV PATH=/usr/local/go/bin:$PATH
+RUN /app/server_cmd --verify --enable-docs /app/doc/mod
 CMD ["/app/server_cmd", "--enable-docs", "/app/doc/mod"]

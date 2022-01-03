@@ -14,6 +14,7 @@ import (
 
 func main() {
 	debug := flag.Bool("debug", false, "debug mode")
+	verify := flag.Bool("verify", false, "verify")
 	enableDocs := flag.Bool("enable-docs", false, "enable docs")
 	staticDocs := flag.Bool("static-docs", false, "enable docs")
 	port := flag.Int("port", 8080, "http port")
@@ -56,6 +57,9 @@ func main() {
 	server, err := server.NewServer(*port, docOptions, secretSource, *debug)
 	if err != nil {
 		golog.Global.Fatal(err)
+	}
+	if *verify {
+		return
 	}
 	if err := server.Run(); err != nil {
 		golog.Global.Fatal(err)
