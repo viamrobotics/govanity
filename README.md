@@ -35,3 +35,9 @@ This will generate a `go.mod` file at `./doc/mod/go.mod` with the latest version
 ## Static Doc Generation
 
 `make docs_static`
+
+## License 
+Copyright 2021-2022 Viam Inc.
+
+Apache 2.0 - See [LICENSE](https://github.com/viamrobotics/govanity/blob/main/LICENSE) file
+
