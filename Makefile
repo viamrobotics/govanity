@@ -15,7 +15,7 @@ goformat:
 	gofmt -s -w .
 	goimports -w -local=go.viam.com/govanity .
 
-lint: goformat
+lint: goformata
 	go install github.com/edaniels/golinters/cmd/combined
 	go list -f '{{.Dir}}' ./... | grep -v gen | xargs go vet -vettool=`go env GOPATH`/bin/combined
 	go list -f '{{.Dir}}' ./... | grep -v gen | xargs go run github.com/golangci/golangci-lint/cmd/golangci-lint run -v
