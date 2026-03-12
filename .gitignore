@@ -18,3 +18,7 @@ gcp.json
 *~
 etc/dist
 docs_dist.tgz
+
+# Claude Code
+.claude/worktrees
+.claude/settings.local.json
