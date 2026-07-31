@@ -1,6 +1,6 @@
 ARG GO_MODULES
 
-FROM golang:1.16.3 as builder
+FROM golang:1.25 AS builder
 WORKDIR /app
 ARG GO_MODULES
 
